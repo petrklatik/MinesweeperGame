@@ -1,1 +1,3 @@
 # MinesweeperGame
+## TODO:
+- everything
