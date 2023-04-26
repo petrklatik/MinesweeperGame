@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -11,9 +12,9 @@ using MinesweeperGame.View;
 
 namespace MinesweeperGame.ViewModel
 {
-    public class MainMenuViewModel : INotifyPropertyChanged
+    public class MainMenuViewModel : NotifyPropertyChangedBase
     {
-        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (32x32)" };
+        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (16x32)" };
         private string _selectedGameSize;
 
         public List<string> GameDifficulties { get; } = new List<string>(GameDifficultiesMap.Keys);
@@ -65,15 +66,18 @@ namespace MinesweeperGame.ViewModel
 
         private void StartGame()
         {
-            GameDifficultiesMap.TryGetValue(SelectedGameDifficulty, out int DifficultyValue);
-            BoardModel boardModel = new(SelectedGameSize, DifficultyValue);
-        }
+            GameDifficultiesMap.TryGetValue(SelectedGameDifficulty, out int difficultyValue);
 
-        // Event and method for property changed notifications
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            var boardModel = new BoardModel(SelectedGameSize, difficultyValue);
+            var gameViewModel = new GameViewModel(boardModel);
+
+            var gameWindow = new GameWindow
+            {
+                DataContext = gameViewModel
+            };
+
+            Application.Current.MainWindow.Hide();
+            gameWindow.Show();
         }
     }
 }

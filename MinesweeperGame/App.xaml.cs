@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MinesweeperGame.View;
+using Prism.Ioc;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -14,4 +16,5 @@ namespace MinesweeperGame
     public partial class App : Application
     {
     }
+
 }
