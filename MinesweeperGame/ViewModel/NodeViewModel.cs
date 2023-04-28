@@ -1,23 +1,32 @@
 ﻿using MinesweeperGame.Model;
 using MinesweeperGame.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace MinesweeperGame.ViewModel
 {
     public class NodeViewModel : NotifyPropertyChangedBase
     {
-        private NodeModel Node;
+        private readonly NodeModel Node;
+
+        public ICommand LeftClickCommand { get; }
+        public ICommand RightClickCommand { get; }
+
+        public Visibility NodeImageVisibility => (IsFlagged || IsMine) ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility EllipseVisibility => (IsFlagged || IsRevealed) ? Visibility.Collapsed : Visibility.Visible;
+
         public bool IsMine
         {
             get => Node.IsMine;
             set
             {
                 Node.IsMine = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(NodeImageVisibility));
+                OnPropertyChanged(nameof(EllipseVisibility));
+                OnPropertyChanged(nameof(NodeImage));
             }
         }
 
@@ -28,6 +37,10 @@ namespace MinesweeperGame.ViewModel
             {
                 Node.IsRevealed = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(NodeImageVisibility));
+                OnPropertyChanged(nameof(EllipseVisibility));
+
+                IsFlagged = false;
             }
         }
 
@@ -37,7 +50,9 @@ namespace MinesweeperGame.ViewModel
             set
             {
                 Node.IsFlagged = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(NodeImageVisibility));
+                OnPropertyChanged(nameof(EllipseVisibility));
+                OnPropertyChanged(nameof(NodeImage));
             }
         }
 
@@ -51,9 +66,34 @@ namespace MinesweeperGame.ViewModel
             }
         }
 
-        public NodeViewModel(NodeModel _node)
+        public NodeViewModel(NodeModel node)
         {
-            Node = _node;
+            Node = node;
+
+            LeftClickCommand = new RelayCommand(ExecuteLeftClick);
+            RightClickCommand = new RelayCommand(ExecuteRightClick);
         }
+
+        public ImageSource NodeImage
+        {
+            get
+            {
+                if (IsFlagged)
+                {
+                    return new BitmapImage(new Uri("pack://application:,,,/MinesweeperGame;component/Assets/flag-48.png"));
+                }
+                else if (IsMine && IsRevealed)
+                {
+                    return new BitmapImage(new Uri("pack://application:,,,/MinesweeperGame;component/Assets/bomb-48.png"));
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+        private void ExecuteLeftClick() => IsRevealed = true;
+        private void ExecuteRightClick() => IsFlagged = !IsFlagged;
+
     }
 }

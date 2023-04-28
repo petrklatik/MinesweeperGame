@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Input;
-using MinesweeperGame.Model;
+﻿using MinesweeperGame.Model;
 using MinesweeperGame.Services;
 using MinesweeperGame.View;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Input;
 
 namespace MinesweeperGame.ViewModel
 {
     public class MainMenuViewModel : NotifyPropertyChangedBase
     {
-        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (16x32)" };
+        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (16x32)"};
         private string _selectedGameSize;
 
         public List<string> GameDifficulties { get; } = new List<string>(GameDifficultiesMap.Keys);

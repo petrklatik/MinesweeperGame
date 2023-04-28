@@ -7,18 +7,28 @@
              BorderThickness="1">
     <UserControl.Style>
         <Style TargetType="UserControl">
+            <Setter Property="Opacity" Value="1"/>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding IsRevealed}" Value="True">
+                    <Setter Property="Opacity" Value=".5"/>
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                </DataTrigger>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Opacity" Value=".5"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </UserControl.Style>
-    <Grid>
+    <Grid Background="{Binding Background, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <Grid.InputBindings>
+            <MouseBinding Command="{Binding LeftClickCommand}" MouseAction="LeftClick" />
+            <MouseBinding Command="{Binding RightClickCommand}" MouseAction="RightClick" />
+        </Grid.InputBindings>
+        <Image x:Name="FlagImage" Source="{Binding NodeImage}" Visibility="{Binding NodeImageVisibility}" />
         <Ellipse x:Name="NodeEllipse"
-                 Fill="{Binding Background, RelativeSource={RelativeSource AncestorType=UserControl}}"
                  Stroke="#888888"
                  StrokeThickness="1"
-                 Margin="7.5,7.5,7.5,7.5" />
+                 Margin="7.5,7.5,7.5,7.5"
+                 Visibility="{Binding EllipseVisibility}" />
     </Grid>
 </UserControl>
