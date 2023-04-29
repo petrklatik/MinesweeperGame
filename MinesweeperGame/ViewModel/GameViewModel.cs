@@ -2,6 +2,8 @@
 using MinesweeperGame.Services;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace MinesweeperGame.ViewModel
@@ -33,6 +35,7 @@ namespace MinesweeperGame.ViewModel
             SetTimer();
         }
 
+
         // Generates NodeViewModel objects for each node on the game board and adds them to the Nodes collection
         private void GenerateBoard()
         {
@@ -40,11 +43,12 @@ namespace MinesweeperGame.ViewModel
             {
                 for (int col = 0; col < Board.Width; col++)
                 {
-                    var nodeViewModel = new NodeViewModel(new NodeModel());
+                    var nodeViewModel = new NodeViewModel(new NodeModel(), this);
                     Nodes.Add(nodeViewModel);
                 }
             }
-            GenerateBombs();
+            GameInitializer.GenerateBombs(Board, Nodes);
+            GameInitializer.CalculateAdjacentMines(Board, Nodes);
         }
 
         // Initializes the timer object, sets its interval to one second, and starts it
@@ -63,23 +67,47 @@ namespace MinesweeperGame.ViewModel
             SecondsTimer++;
         }
 
-        //WILL BE REMOVED, just trying if everything displays correctly
-        private void GenerateBombs()
+        public async void GameOver()
         {
-            Random random = new();
-            int totalCells = Board.Height * Board.Width;
-            int totalBombs = Board.NumberOfBombs;
+            _timer.Stop();
+            ShowAllNodes();
+            await Task.Delay(3000);
 
-            for (int i = 0; i < totalBombs; i++)
+            //TODO: open and close the windows
+            Application.Current.Shutdown();
+        }
+
+        private void ShowAllNodes()
+        {
+            foreach (var node in Nodes)
             {
-                int randomIndex = random.Next(0, totalCells);
+                node.IsRevealed = true;
+            }
+        }
 
-                while (Nodes[randomIndex].IsMine)
+        public void RevealZeroAdjacentNodes(NodeViewModel nodeViewModel)
+        {
+            nodeViewModel.IsRevealed = true;
+
+            for (int rowOffset = -1; rowOffset <= 1; rowOffset++)
+            {
+                for (int colOffset = -1; colOffset <= 1; colOffset++)
                 {
-                    randomIndex = random.Next(0, totalCells);
-                }
+                    if (GameInitializer.IsNeighbor(Board, Nodes.IndexOf(nodeViewModel), rowOffset, colOffset))
+                    {
+                        int neighborIndex = GameInitializer.GetNeighborIndex(Board, Nodes.IndexOf(nodeViewModel), rowOffset, colOffset);
+                        var neighborNode = Nodes[neighborIndex];
 
-                Nodes[randomIndex].IsMine = true;
+                        if (!neighborNode.IsRevealed && neighborNode.AdjacentMines == 0)
+                        {
+                            RevealZeroAdjacentNodes(neighborNode);
+                        }
+                        else
+                        {
+                            neighborNode.IsRevealed = true;
+                        }
+                    }
+                }
             }
         }
     }

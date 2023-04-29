@@ -9,7 +9,7 @@ namespace MinesweeperGame.ViewModel
 {
     public class MainMenuViewModel : NotifyPropertyChangedBase
     {
-        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (16x32)"};
+        public List<string> GameSizes { get; } = new List<string> { "Small (9x9)", "Medium (16x16)", "Large (16x32)" };
         private string _selectedGameSize;
 
         public List<string> GameDifficulties { get; } = new List<string>(GameDifficultiesMap.Keys);
@@ -20,7 +20,7 @@ namespace MinesweeperGame.ViewModel
         {
             { "Easy", 10 },
             { "Medium", 20 },
-            { "Hard", 30 }
+            { "Hard", 30 },
         };
 
         public ICommand StartGameCommand { get; }

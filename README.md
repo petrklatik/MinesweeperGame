@@ -17,7 +17,6 @@ This is a Minesweeper game implemented in C# using the MVVM architecture. The go
 
 ## TODO
 
-- Create the algorithm for generating the bombs with the feature of first safe click.
-- Implement the game logic
-- Add functionality for revealing multiple tiles at once when a safe tile is clicked.
-- Implenent the Win and Lose conditions.
+- Remake the algorithm for generating the bombs with the feature of first safe click.
+- Implement the Win conditions and better Lose conditions.
+- Improve the Window management (creating some sort of window manager).

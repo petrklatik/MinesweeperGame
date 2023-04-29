@@ -25,6 +25,12 @@
             <MouseBinding Command="{Binding RightClickCommand}" MouseAction="RightClick" />
         </Grid.InputBindings>
         <Image x:Name="FlagImage" Source="{Binding NodeImage}" Visibility="{Binding NodeImageVisibility}" />
+        <TextBlock x:Name="BombsNmber" Text="{Binding AdjacentMines}" Visibility="{Binding NumberVisibility}" 
+                   FontWeight="Bold"
+                   FontSize="20"
+                   Margin="1"
+                   TextAlignment="Center"
+                   VerticalAlignment="Center" />
         <Ellipse x:Name="NodeEllipse"
                  Stroke="#888888"
                  StrokeThickness="1"
