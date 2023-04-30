@@ -1,40 +1,58 @@
-﻿using MinesweeperGame.ViewModel;
+﻿using MinesweeperGame.Helpers;
+using MinesweeperGame.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace MinesweeperGame.Model
 {
     public static class GameInitializer
     {
-        public static void GenerateBombs(BoardModel board, ObservableCollection<NodeViewModel> nodes)
+        //  Generates bombs on the board and then calculates adjacent mines for each node
+        public static void GenerateBombs(BoardModel board, ObservableCollection<NodeViewModel> nodes, int startingIndex)
         {
             Random random = new();
-            int totalCells = board.Height * board.Width;
+            int freeCells = 1; // Starting from 1 because startingIndex is added when initializing
+            int totalCells = nodes.Count;
             int totalBombs = board.NumberOfBombs;
 
-            for (int i = 0; i < totalBombs; i++)
+            HashSet<int> selectedIndexes = new() {startingIndex };
+
+            // Loop through each neighbor of the startingIndex that they cannot be populated
+            for (int rowOffset = -1; rowOffset <= 1; rowOffset++)
+            {
+                for (int colOffset = -1; colOffset <= 1; colOffset++)
+                {
+                    if (BoardHelper.IsNeighbor(board, startingIndex, rowOffset, colOffset))
+                    {
+                        int neighborIndex = BoardHelper.GetNeighborIndex(board, startingIndex, rowOffset, colOffset);
+                        selectedIndexes.Add(neighborIndex);
+                        freeCells++;
+                    }
+                }
+            }
+            // Randomly selects cells to add to the selectedIndexes set until the set contains the total number of bombs.
+            while (selectedIndexes.Count < (totalBombs + freeCells))
             {
                 int randomIndex = random.Next(0, totalCells);
-
-                while (nodes[randomIndex].IsMine)
+                if (!selectedIndexes.Contains(randomIndex))
                 {
-                    randomIndex = random.Next(0, totalCells);
+                    selectedIndexes.Add(randomIndex);
+                    nodes[randomIndex].IsMine = true;
                 }
-
-                nodes[randomIndex].IsMine = true;
             }
+            CalculateAdjacentMines(board, nodes);
         }
 
-        public static void CalculateAdjacentMines(BoardModel board, ObservableCollection<NodeViewModel> nodes)
+        private static void CalculateAdjacentMines(BoardModel board, ObservableCollection<NodeViewModel> nodes)
         {
             for (int i = 0; i < nodes.Count; i++)
             {
-                int adjacentMines = CountAdjacentMines(board, nodes, i);
-                nodes[i].AdjacentMines = adjacentMines;
+                nodes[i].AdjacentMines = CountMinesForNode(board, nodes, i);
             }
         }
 
-        private static int CountAdjacentMines(BoardModel board, ObservableCollection<NodeViewModel> nodes, int index)
+        private static int CountMinesForNode(BoardModel board, ObservableCollection<NodeViewModel> nodes, int index)
         {
             int adjacentMines = 0;
 
@@ -42,36 +60,26 @@ namespace MinesweeperGame.Model
             {
                 for (int colOffset = -1; colOffset <= 1; colOffset++)
                 {
-                    if (IsNeighbor(board, index, rowOffset, colOffset))
-                    {
-                        int neighborIndex = GetNeighborIndex(board, index, rowOffset, colOffset);
-
-                        if (nodes[neighborIndex].IsMine)
-                        {
-                            adjacentMines++;
-                        }
-                    }
+                    adjacentMines += CountMinesInNeighbor(board, nodes, index, rowOffset, colOffset);
                 }
             }
             return adjacentMines;
         }
 
-        public static bool IsNeighbor(BoardModel board, int index, int rowOffset, int colOffset)
+        private static int CountMinesInNeighbor(BoardModel board, ObservableCollection<NodeViewModel> nodes, int index, int rowOffset, int colOffset)
         {
-            int neighborRow = (index / board.Width) + rowOffset;
-            int neighborCol = (index % board.Width) + colOffset;
+            int adjacentMines = 0;
 
-            return neighborRow >= 0 && neighborRow < board.Height &&
-                   neighborCol >= 0 && neighborCol < board.Width &&
-                   !(rowOffset == 0 && colOffset == 0);
+            if (BoardHelper.IsNeighbor(board, index, rowOffset, colOffset))
+            {
+                int neighborIndex = BoardHelper.GetNeighborIndex(board, index, rowOffset, colOffset);
+
+                if (nodes[neighborIndex].IsMine)
+                {
+                    adjacentMines++;
+                }
+            }
+            return adjacentMines;
         }
-
-        public static int GetNeighborIndex(BoardModel board, int index, int rowOffset, int colOffset)
-        {
-            int neighborRow = (index / board.Width) + rowOffset;
-            int neighborCol = (index % board.Width) + colOffset;
-            return (neighborRow * board.Width) + neighborCol;
-        }
-
     }
 }

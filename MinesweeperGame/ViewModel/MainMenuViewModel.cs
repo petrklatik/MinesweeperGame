@@ -20,7 +20,7 @@ namespace MinesweeperGame.ViewModel
         {
             { "Easy", 10 },
             { "Medium", 20 },
-            { "Hard", 30 },
+            { "Hard", 30 }
         };
 
         public ICommand StartGameCommand { get; }

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using MinesweeperGame.ViewModel;
+using System.Windows;
 
 namespace MinesweeperGame.View
 {

@@ -22,8 +22,16 @@ namespace MinesweeperGame.ViewModel
         public Visibility EllipseVisibility => (IsFlagged || IsRevealed) ? Visibility.Collapsed : Visibility.Visible;
         public Visibility NumberVisibility => (IsRevealed && AdjacentMines > 0 && !IsMine) ? Visibility.Visible : Visibility.Collapsed;
 
-        // The number of mines adjacent to this node
-        public int AdjacentMines { get; set; }
+        private int adjacentMines;
+        public int AdjacentMines
+        {
+            get => adjacentMines;
+            set
+            {
+                adjacentMines = value;
+                OnPropertyChanged();
+            }
+        }
 
         public bool IsMine
         {
@@ -96,10 +104,16 @@ namespace MinesweeperGame.ViewModel
         private void ExecuteLeftClick()
         {
             if (IsRevealed) return;
+            if (gameViewModel.IsFirstClick)
+            {
+                gameViewModel.IsFirstClick = false;
+                gameViewModel.PopulateWithMines(this);
+            }
+
             if (IsMine)
             {
-                MessageBox.Show("YOU WERE BOMBED! GAME OVER!");
-                gameViewModel.GameOver();
+                // Game lost
+                gameViewModel.EndGame(false);
             }
             else if (AdjacentMines == 0)
             {
@@ -109,7 +123,21 @@ namespace MinesweeperGame.ViewModel
             {
                 IsRevealed = true;
             }
+            CheckWinConditions();
         }
-        private void ExecuteRightClick() => IsFlagged = !IsFlagged;
+        private void ExecuteRightClick()
+        {
+            IsFlagged = !IsFlagged;
+            CheckWinConditions();
+        }
+
+        private void CheckWinConditions()
+        {
+            if (gameViewModel.IsGameWon)
+            {
+                //Game won
+                gameViewModel.EndGame(true);
+            }
+        }
     }
 }
