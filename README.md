@@ -12,7 +12,7 @@ This is a classic Minesweeper game implemented using C#, WPF and the MVVM design
 
 ## How to Play
 
-The objective of the game is to clear a rectangular board containing hidden "mines" or bombs without detonating any of them, with the help of clues about the number of neighboring mines in each field.
+The objective of the game is to clear a rectangular board containing hidden mines without detonating any of them, with the help of clues about the number of neighboring mines in each field.
 
 1. To reveal a tile, simply left-click on it. If the tile contains a mine, the game is over. If it is a non-mine tile, a number will be revealed, indicating how many mines are adjacent to that tile.
 
